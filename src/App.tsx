@@ -1,33 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import ProductList from './ProductList'
+import ProductTypes from './Product'
+import ProductService from './ProductService'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [productDescription, setProductDescription] = useState('')
+  const [productsList, setProductList] = useState<ProductTypes[]>([])
+    // Cargar products existentes
+    useEffect(() => {
+      const savedProducts = ProductService.getProducts()
+      setProductList(savedProducts)
+    }, [])
+  
+    const handleChange = (e: any) => {
+      setProductDescription(e.target.value)  
+    }
+  
+    // Agregar nueva tarea
+    const handleClick = () => {
+      if (productDescription.trim() === '') return;
+  
+      const newProduct = ProductService.addProduct(productDescription);
+      // Actualizar el estado con la nueva tarea
+      setProductList((prevProducts) => [newProduct, ...prevProducts]);
+      setProductDescription('');
+    };
+    
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div style={{border: '1px solid grey', padding: '20px'}}>
+        
+        <div>
+          <input 
+            type="text" 
+            placeholder="Enter your task" 
+            onChange={handleChange}
+            value={productDescription} 
+            style={{padding: '10px', width: '300px', marginRight: '10px'}}
+          />
+          <button onClick={handleClick}>Add product</button>
+        </div>
+        <br />
+        <ProductList products={productsList} setProducts={setProductList}/>
+    </div>
+    
     </>
   )
 }
