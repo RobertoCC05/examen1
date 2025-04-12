@@ -20,7 +20,18 @@ const ProductList = ({ products, setProducts }
       ProductService.deleteProduct(id);
       const updatedProducts = ProductService.getProducts();
       setProducts(updatedProducts);
-  };
+    };
+
+    const handleChecked = (id: number) => {  // Cambia el estado de completado de una item
+      const updatedProduct = ProductService.checkProductOutOfStock(id); 
+      if (updatedProduct) {
+        setProducts((prev) => // actualiza la lista de items
+          prev.map((product) => (product.id === id ? updatedProduct : product)) // Reemplaza la item editada por la actualizada
+        );
+      }
+    };
+
+    const sortedProducts = [...products].sort((a, b) => Number(a.outOfStock) - Number(b.outOfStock)); // Ordena los productos por estado de completado
     
     return (
         <div className="product-list-container">
@@ -30,18 +41,14 @@ const ProductList = ({ products, setProducts }
             <p>The Inventory is empty .</p>
           ) : (
             <ul className="product-list">
-              {products.map((product) => (
+              {sortedProducts.map((product) => (
                 <li key={product.id} className="product-item">
-                  <div className="product-info" style={{border: '2px solid grey', padding: '10px', borderRadius: '5px'}}>
                   <input
                     type="checkbox"
-                    //checked={product.outOfStock}
-                    
+                    checked={product.outOfStock}
+                    onClick={() => handleChecked(product.id)}
                   />
-                  <span style={{color:'grey'}}>Mark product out of Stock</span>
-                  </div>
-                  
-
+                  <span style={{color:'grey'}}>Mark product out of Stock</span>                 
                   
                   {editingProductId === product.id ? (
                     <div className="edit-mode">
@@ -52,8 +59,8 @@ const ProductList = ({ products, setProducts }
                         className="edit-input"
                       />
                       <div className="edit-buttons">
-                        <button  >Guardar</button>
-                        <button>Cancelar</button>
+                        <button >Guardar</button>
+                        
                       </div>
                     </div>
                   ) : (
@@ -61,15 +68,18 @@ const ProductList = ({ products, setProducts }
                         <span
                           className="product-description"
                           style={{
-                            color: product.stock ? 'red' : 'white',
-                            textDecoration: product.stock ? 'line-through' : 'none'
+                            color: product.outOfStock ? 'red' : 'white',
+                            textDecoration: product.outOfStock ? 'line-through' : 'none'
                           }}
                         >
                           {product.description}
                         </span>
 
-                        
-
+                        {product.outOfStock && product.date && (
+                          <div style={{ fontSize: '12px', color: '#aaa', marginTop: '4px' }}>
+                            Out of stock the date: {new Date(product.date).toLocaleString('es-CR')}
+                          </div>
+                        )}
                         <button
                           className="edit-button"
                         >
@@ -79,7 +89,7 @@ const ProductList = ({ products, setProducts }
                   )}
                   <button 
                   onClick={() => handleDeleteProduct(product.id)}
-                  style={{marginLeft: '10px', color: 'red'}}>
+                  style={{marginLeft: '10px', color: 'white', backgroundColor: 'red', border: 'none', padding: '10px', borderRadius: '5px'}}>
                   Eliminar
                 </button>
                 
@@ -94,35 +104,21 @@ const ProductList = ({ products, setProducts }
 export default ProductList;
 
 
+
+
 /**  // Guarda los cambios de la item editada.
     const handleEditSave = (id:number) =>{
-       // Si la descripción editada no está vacía, guarda los cambios.
-        if(editedProductDescription.trim() !== ''){
-            const updateProduct = ProductService.updateProduct({id,description:editedProductDescription,completed:false});
-            //Se actualiza la lista de items, reemplanzado la editada
-            setProducts((prevProducts) => prevProducts.map((product) => (product.id == id? updateProduct: product)));
-            //Se cancela la edicion luego de guardar
-            setEditProductId(null);
-            setEditedDescription("");
-        }
-    }
-    // Elimina una item, utilizando el servicio para borrar de localStorage.
-    const handleDeleteProduct = (id: number) => {
-        console.log("Deleting product with ID:", id);
-        ProductService.deleteProduct(id);
-        const updatedProducts = ProductService.getProducts();
-        console.log("Updated products:", updatedProducts);
-        setProducts(updatedProducts);
-    };
-
-    const handleToggleCompleted = (id: number) => {  // Cambia el estado de completado de una item
-      const updatedProduct = ProductService.toggleCompleted(id); 
-      if (updatedProduct) {
-        setProducts((prev) => // actualiza la lista de items
-          prev.map((product) => (product.id === id ? updatedProduct : product)) // Reemplaza la item editada por la actualizada
-        );
-      }
-    }; 
+  // Si la descripción editada no está vacía, guarda los cambios.
+   if(editedProductDescription.trim() !== ''){
+       const updateProduct = ProductService.updateProduct({id,description:editedProductDescription,completed:false});
+       //Se actualiza la lista de items, reemplanzado la editada
+       setProducts((prevProducts) => prevProducts.map((product) => (product.id == id? updateProduct: product)));
+       //Se cancela la edicion luego de guardar
+       setEditProductId(null);
+       setEditedDescription("");
+   }
+}
+     
     
     
     <button  >Guardar</button>
