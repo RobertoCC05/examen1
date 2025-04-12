@@ -18,6 +18,13 @@ const ProductService = {
         return newProduct;
     },
 
+    updateProduct: (product: ProductTypes): ProductTypes =>{
+        const products = ProductService.getProducts();
+        const updateProducts = products.map((p) => (p.id == product.id ? product : p))
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updateProducts));
+        return product;
+    },
+
     deleteProduct: (id: number) => {
         const products = ProductService.getProducts();
         const updatedProducts = products.filter((product) => product.id !== id);

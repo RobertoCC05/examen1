@@ -30,7 +30,17 @@ const ProductList = ({ products, setProducts }
         );
       }
     };
-
+    const handleEditStart = (id:number, description:string) =>{
+      setEditProductId(id);
+      setEditedDescription(description);
+  }
+  
+    const handleEditSave = (id:number) =>{
+      const updateProduct = ProductService.updateProduct({id,description:editedProductDescription,outOfStock:false});
+      setProducts((prevProducts) => prevProducts.map((product) => (product.id == id? updateProduct: product)));
+      setEditProductId(null);
+      setEditedDescription("");
+    }
     const sortedProducts = [...products].sort((a, b) => Number(a.outOfStock) - Number(b.outOfStock)); // Ordena los productos por estado de completado
     
     return (
@@ -59,8 +69,7 @@ const ProductList = ({ products, setProducts }
                         className="edit-input"
                       />
                       <div className="edit-buttons">
-                        <button >Guardar</button>
-                        
+                        <button onClick={() => handleEditSave(product.id)}>Guardar</button>
                       </div>
                     </div>
                   ) : (
@@ -79,8 +88,9 @@ const ProductList = ({ products, setProducts }
                           <div style={{ fontSize: '12px', color: '#aaa', marginTop: '4px' }}>
                             Out of stock the date: {new Date(product.date).toLocaleString('es-CR')}
                           </div>
-                        )}
+                        )}  
                         <button
+                        onClick={() => handleEditStart(product.id, product.description)}
                           className="edit-button"
                         >
                           Editar
