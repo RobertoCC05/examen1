@@ -15,6 +15,12 @@ const ProductList = ({ products, setProducts }
     const [editingProductId, setEditProductId] = useState<number | null>(null);
     const [editedProductDescription, setEditedDescription] = useState<string>("")
 
+    // Elimina una item, utilizando el servicio para borrar de localStorage.
+    const handleDeleteProduct = (id: number) => {
+      ProductService.deleteProduct(id);
+      const updatedProducts = ProductService.getProducts();
+      setProducts(updatedProducts);
+  };
     
     return (
         <div className="product-list-container">
@@ -26,10 +32,15 @@ const ProductList = ({ products, setProducts }
             <ul className="product-list">
               {products.map((product) => (
                 <li key={product.id} className="product-item">
+                  <div className="product-info" style={{border: '2px solid grey', padding: '10px', borderRadius: '5px'}}>
                   <input
                     type="checkbox"
-                    //checked={product.stock}
+                    //checked={product.outOfStock}
+                    
                   />
+                  <span style={{color:'grey'}}>Mark product out of Stock</span>
+                  </div>
+                  
 
                   
                   {editingProductId === product.id ? (
@@ -67,9 +78,8 @@ const ProductList = ({ products, setProducts }
                       </div>
                   )}
                   <button 
-                  //onClick={() => handleDeleteProduct(product.id)}
-                  style={{marginLeft: '10px', color: 'red'}}
-                >
+                  onClick={() => handleDeleteProduct(product.id)}
+                  style={{marginLeft: '10px', color: 'red'}}>
                   Eliminar
                 </button>
                 

@@ -19,6 +19,12 @@ const ProductService = {
         return newProduct;
     },
 
+    deleteProduct: (id: number) => {
+        const products = ProductService.getProducts();
+        const updatedProducts = products.filter((product) => product.id !== id);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedProducts));
+    },
+
 
 };
 
